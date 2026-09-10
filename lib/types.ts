@@ -1,0 +1,22 @@
+export type Evidence = { source: string; detail: string };
+export type CandidateProfile = {
+  id: string; fullName: string; email: string; phone: string; location: string;
+  links: { linkedin?: string; github?: string; portfolio?: string };
+  education: { institution: string; degree: string; field: string; graduation?: string }[];
+  skills: string[]; experience: { organization: string; title: string; summary: string }[];
+  projects: { name: string; organization: string; period: string; summary: string }[];
+  languages: { language: string; level: string }[];
+  interests: { area: string; detail: string; source: string }[];
+  narrativeStrengths: { label: string; detail: string; source: string }[];
+  sourceDocuments: { name: string; path: string; kind: "cv" | "other" }[];
+  identityGuardrails: { allowedPerson: string; forbiddenNames: string[]; rule: string };
+  workAuthorization: { country: string; status: "confirmed" | "unknown"; detail: string };
+  sponsorshipRequired: "yes" | "no" | "unknown";
+  evidence: Evidence[];
+};
+export type DetectedField = { id: string; label: string; name: string; type: string; required: boolean; options?: string[]; category: "static" | "open-ended" | "eligibility" | "unknown"; value?: string; confidence?: number; needsReview: boolean; evidence?: string };
+export type Job = { id: string; company: string; title: string; url: string; ats: string; description: string; createdAt: string };
+export type Application = { id: string; jobId: string; status: "draft" | "review" | "ready" | "submitted" | "rejected" | "interview" | "offer"; fields: DetectedField[]; createdAt: string; updatedAt: string; submissionConfirmedAt?: string };
+export type OpportunityStatus = "found" | "saved" | "applied" | "interview" | "rejected" | "offer";
+export type Opportunity = { id: string; company: string; tier: "A" | "B" | "C" | "D"; country: string; region: string; title: string; url: string; location: string; description: string; fitScore: number; fitReasons: string[]; concerns: string[]; eligibility: "likely" | "manual-check" | "unlikely"; status?: OpportunityStatus; discoveredAt: string };
+export type Store = { profile: CandidateProfile; jobs: Job[]; applications: Application[]; opportunities?: Opportunity[]; lastDiscoveryAt?: string };

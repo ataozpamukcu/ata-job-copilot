@@ -1,0 +1,6 @@
+import { NextResponse } from "next/server";
+import { inspectAts } from "@/lib/ats";
+import { mapStatic } from "@/lib/mapping";
+import { readStore,writeStore } from "@/lib/store";
+export const runtime="nodejs"; export const maxDuration=120;
+export async function POST(req:Request){try{const {opportunityId}=await req.json();const store=await readStore();const op=(store.opportunities||[]).find(x=>x.id===opportunityId);if(!op)throw new Error("Opportunity not found");if(op.eligibility==="unlikely")throw new Error("This role has a likely hard requirement mismatch; review the listing manually first");const scan=await inspectAts(op.url);const now=new Date().toISOString();const job={id:crypto.randomUUID(),company:op.company,title:op.title,url:op.url,ats:scan.ats,description:op.description,createdAt:now};const application={id:crypto.randomUUID(),jobId:job.id,status:"review" as const,fields:scan.fields.map(f=>mapStatic(f,store.profile)),createdAt:now,updatedAt:now};store.jobs.unshift(job);store.applications.unshift(application);await writeStore(store);return NextResponse.json({job,application})}catch(e){return NextResponse.json({error:e instanceof Error?e.message:"Preparation failed"},{status:400})}}
